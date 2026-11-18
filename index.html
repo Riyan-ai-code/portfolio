@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parthib Dey | 3D AI, ML & Full-Stack Engineering Portfolio</title>
+  <meta name="description" content="Interactive 3D WebGL portfolio of Parthib Dey — Aspiring Full-Stack AI Engineer specializing in Generative AI, GraphRAG, Computer Vision, MLOps, Next.js, and FastAPI." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- GSAP for smooth 3D camera fly-to animations -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+
+  <!-- ES Module Import Map for Three.js -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <!-- =====================================================================
+       LAYER 1: GIANT ULTRA-BLACK BACKDROP WORD BEHIND 3D MODELS
+       ===================================================================== -->
+  <div class="backdrop-word-stage" aria-hidden="true">
+    <div id="backdrop-word" class="backdrop-giant-text">PARTHIB</div>
+  </div>
+
+  <!-- =====================================================================
+       LAYER 2: TRANSPARENT 3D WEBGL SCENE (BLACK KNIGHT + WHITE STATUE)
+       ===================================================================== -->
+  <div class="canvas-wrapper">
+    <canvas id="webgl-canvas" aria-label="Interactive 3D Obsidian Knight and White Alabaster Sculpture"></canvas>
+  </div>
+  <div id="labels-container" aria-hidden="false"></div>
+
+  <!-- =====================================================================
+       TOP MINIMAL STUDIO NAVIGATION
+       ===================================================================== -->
+  <header class="navbar interactive-panel">
+    <a href="#top" class="nav-brand">
+      <span class="brand-orb"></span>
+      <span id="nav-handle">PARTHIB DEY</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#top">3D Stage</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills (7 Domains)</a></li>
+      <li><a href="#projects">AI & Web Projects</a></li>
+      <li><a href="#ai-terminal">+AI Terminal</a></li>
+      <li><a href="#experience">Education</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="hud-btn" data-camera-preset="overview" type="button">Stage</button>
+      <button class="hud-btn" data-camera-preset="knight" type="button">Knight</button>
+      <button class="hud-btn" data-camera-preset="statue" type="button">Statue</button>
+      <button class="hud-btn" data-camera-preset="constellation" type="button">3D Skills</button>
+      <button id="btn-zen-mode" class="hud-btn hud-btn-accent" type="button">Pure 3D View</button>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       RIGHT-EDGE INTERACTIVE NEON LIGHT / SECTION SIDEBAR
+       ===================================================================== -->
+  <nav class="cyber-light-sidebar interactive-panel" aria-label="Section Progress Sidebar">
+    <div class="sidebar-light-track">
+      <div id="sidebar-light-fill" class="sidebar-light-fill"></div>
+    </div>
+    <a href="#top" class="sidebar-node-dot active" data-section="top" data-label="00 // 3D Stage"></a>
+    <a href="#about" class="sidebar-node-dot" data-section="about" data-label="01 // About"></a>
+    <a href="#skills" class="sidebar-node-dot" data-section="skills" data-label="02 // 7 Skill Domains"></a>
+    <a href="#projects" class="sidebar-node-dot" data-section="projects" data-label="03 // 3 Flagship Projects"></a>
+    <a href="#ai-terminal" class="sidebar-node-dot" data-section="ai-terminal" data-label="04 // +AI Terminal"></a>
+    <a href="#experience" class="sidebar-node-dot" data-section="experience" data-label="05 // Education"></a>
+    <a href="#contact" class="sidebar-node-dot" data-section="contact" data-label="06 // Contact"></a>
+  </nav>
+
+  <!-- =====================================================================
+       RIGHT-SIDE 3D SKILL NODE INSPECTOR DRAWER
+       ===================================================================== -->
+  <aside id="skill-inspector" class="skill-inspector interactive-panel" aria-live="polite">
+    <div class="inspector-header">
+      <span id="inspector-category" class="inspector-badge">Generative AI</span>
+      <button id="inspector-close" class="inspector-close" type="button" title="Close Inspector (Esc)">×</button>
+    </div>
+    <h2 id="inspector-title" class="inspector-title">RAG & GraphRAG</h2>
+
+    <div class="inspector-meter">
+      <div class="inspector-meter-top">
+        <span>Production Proficiency</span>
+        <strong id="inspector-level-text">96%</strong>
+      </div>
+      <div class="inspector-bar-bg">
+        <div id="inspector-bar-fill" class="inspector-bar-fill" style="width: 96%;"></div>
+      </div>
+    </div>
+
+    <p id="inspector-desc" class="inspector-desc"></p>
+
+    <div class="inspector-subheading">Technologies & Frameworks</div>
+    <div id="inspector-tags" class="skill-tags"></div>
+
+    <div class="inspector-subheading">Connected 3D Neural Nodes</div>
+    <div id="inspector-connections" class="connected-nodes-list"></div>
+
+    <div class="inspector-chain-stepper">
+      <button id="btn-inspector-prev" class="hud-btn" type="button">← Prev 3D Node</button>
+      <button id="btn-inspector-next" class="hud-btn hud-btn-accent" type="button">Next 3D Node →</button>
+    </div>
+  </aside>
+
+  <!-- =====================================================================
+       FLOATING INTERACTIVE 3D STAGE COMMAND DOCK (Directly on 3D Viewport!)
+       ===================================================================== -->
+  <div class="stage-interactive-dock interactive-panel">
+    <div class="dock-status-pill" id="stage-live-status">
+      <span class="pulse-dot"></span>
+      <span><strong>Interactive 3D Stage:</strong> Drag Knight/Statue to spin • Click any #01–#12 node • Scroll to zoom</span>
+    </div>
+
+    <div class="dock-actions">
+      <button id="btn-chain-prev" class="hud-btn" type="button" title="Previous 3D Skill Node">← Prev Node</button>
+      <button id="btn-auto-tour" class="hud-btn hud-btn-accent" type="button">▶ Auto-Tour 12 Nodes</button>
+      <button id="btn-chain-next" class="hud-btn" type="button" title="Next 3D Skill Node">Next Node →</button>
+      <span class="dock-divider"></span>
+      <button class="hud-btn" data-stage-project="deepfake-detector" type="button">🎬 Deepfake (97.3%)</button>
+      <button class="hud-btn" data-stage-project="impact-iq" type="button">🧠 Impact-IQ (GraphRAG)</button>
+      <button class="hud-btn" data-stage-project="disaster-radar-ai" type="button">🌪️ DisasterRadar (0.978)</button>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       BOTTOM BERSUS MEDIA PLAYER / TIMELINE SCRUBBER BAR (Matches Screenshot!)
+       ===================================================================== -->
+  <div class="bersus-player-bar interactive-panel">
+    <!-- Play / Pause 3D Turntable Button -->
+    <button id="btn-player-toggle" class="player-circle-btn" type="button" title="Pause / Play 3D Stage Motion">
+      <svg id="icon-pause" viewBox="0 0 24 24">
+        <rect x="6" y="5" width="4" height="14" rx="1.2"></rect>
+        <rect x="14" y="5" width="4" height="14" rx="1.2"></rect>
+      </svg>
+      <svg id="icon-play" viewBox="0 0 24 24" style="display:none;">
+        <path d="M8 5v14l11-7z"></path>
+      </svg>
+    </button>
+
+    <!-- Toggle 3D Skill Nodes / Mute Button -->
+    <button id="btn-neural-pulse" class="player-circle-btn" type="button" title="Toggle 3D Skill Crystals">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3l3.5 3.5-1.5 1.5L15 13.5 11.5 17 10 15.5 13.5 12 10 8.5 11.5 7 15 10.5 18.5 7 20 8.5 16.5 12z"></path>
+      </svg>
+    </button>
+
+    <!-- Interactive Pink Timeline Scrubber Track -->
+    <div id="player-timeline-track" class="player-timeline-track" title="Click or drag to scrub 3D stage rotation">
+      <div id="player-timeline-fill" class="player-timeline-fill" style="width: 65%;"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MAIN SCROLLABLE PAGE OVERLAY
+       ===================================================================== -->
+  <main id="top" class="page-content">
+
+    <!-- FIRST VIEWPORT (100VH): PURE BERSUS 3D SCULPTURE SHOWCASE -->
+    <section class="hero-section container" aria-label="3D Sculpture Stage">
+      <!-- Intentionally clean so the first screen matches the Bersus screenshot 1:1 -->
+    </section>
+
+    <!-- ABOUT / CAREER OBJECTIVE SECTION -->
+    <section id="about" class="section container">
+      <div class="hero-floating-bar">
+        <div class="hero-intro-pill interactive-panel">
+          <div class="availability-pill">
+            <span class="pulse-dot"></span>
+            <span id="hero-availability">B.E. AI & ML @ CMRIT Bengaluru (2027)</span>
+          </div>
+
+          <h1 class="hero-title" id="hero-name">Parthib Dey</h1>
+          <p id="hero-role" class="hero-role">Aspiring Full-Stack AI Engineer</p>
+          <p id="hero-tagline" class="hero-tagline">
+            Aspiring Full-Stack AI Engineer specializing in scalable applications powered by Machine Learning and Generative AI. Experienced in building end-to-end systems using Next.js, React, Node.js, and FastAPI. Skilled in computer vision, predictive modeling, GraphRAG, and AI-powered automation.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="#projects" class="btn-primary">Explore 3 Flagship AI Projects ↓</a>
+            <a href="https://github.com/Riyan-ai-code" target="_blank" rel="noopener" class="btn-secondary">GitHub (Riyan-ai-code) ↗</a>
+            <a href="mailto:Parthib100320@gmail.com" class="btn-secondary">✉ Parthib100320@gmail.com</a>
+          </div>
+        </div>
+
+        <div id="hero-stats" class="hero-stats-grid interactive-panel"></div>
+      </div>
+    </section>
+
+    <!-- SYNCHRONIZED 3D SKILLS MATRIX SECTION -->
+    <section id="skills" class="section container">
+      <div class="section-header interactive-panel">
+        <span class="section-eyebrow">01 // 7-Domain Neural & Full-Stack Architecture</span>
+        <h2 class="section-title">Technical Skills (7 Categories)</h2>
+        <p class="section-subtitle">
+          Click any category card or filter button below to deploy its 3D skill crystals around the sculptures, or click an individual skill to fly the 3D camera directly to it.
+        </p>
+      </div>
+
+      <!-- 7-Category Overview Grid -->
+      <div id="category-overview-grid" class="category-overview-grid interactive-panel"></div>
+
+      <!-- 7-Category Filter Bar -->
+      <div class="filter-bar interactive-panel">
+        <button class="filter-btn active" data-filter-category="all" type="button">All Categories (12 Nodes)</button>
+        <button class="filter-btn" data-filter-category="languages" type="button">💻 Programming Languages</button>
+        <button class="filter-btn" data-filter-category="gen-ai" type="button">🧠 Generative AI</button>
+        <button class="filter-btn" data-filter-category="ml-fundamentals" type="button">📊 ML & Fundamentals</button>
+        <button class="filter-btn" data-filter-category="web-tech" type="button">🌐 Web Technologies</button>
+        <button class="filter-btn" data-filter-category="database" type="button">🗄️ Database</button>
+        <button class="filter-btn" data-filter-category="devops" type="button">🐳 DevOps & Deployment</button>
+        <button class="filter-btn" data-filter-category="platforms-tools" type="button">🛠️ Platforms & Tools</button>
+      </div>
+
+      <div id="skills-grid" class="skills-grid interactive-panel"></div>
+    </section>
+
+    <!-- FEATURED AI + WEB PROJECTS SECTION -->
+    <section id="projects" class="section container">
+      <div class="section-header interactive-panel">
+        <span class="section-eyebrow">02 // Flagship Production Systems</span>
+        <h2 class="section-title">Featured AI & Full-Stack Projects</h2>
+        <p class="section-subtitle">
+          Click <strong>"🌐 Visualize Stack in 3D"</strong> on any project to deploy and highlight its exact 3D skill crystals on the stage.
+        </p>
+      </div>
+
+      <div id="projects-grid" class="projects-grid interactive-panel"></div>
+    </section>
+
+    <!-- INTERACTIVE AI COMMAND TERMINAL SECTION -->
+    <section id="ai-terminal" class="section container">
+      <div class="section-header interactive-panel">
+        <span class="section-eyebrow">03 // Interactive +AI Shell</span>
+        <h2 class="section-title">Query Parthib's AI & Web Stack</h2>
+        <p class="section-subtitle">
+          Run interactive diagnostic commands or click a chip below to inspect projects and control the 3D stage.
+        </p>
+      </div>
+
+      <div class="terminal-card interactive-panel">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="dot-red"></span>
+            <span class="dot-yellow"></span>
+            <span class="dot-green"></span>
+          </div>
+          <div class="terminal-title">parthib-ai-shell — bash — 80×24</div>
+          <div></div>
+        </div>
+
+        <div class="terminal-quick-actions">
+          <button class="cmd-chip" data-terminal-cmd="help" type="button">help</button>
+          <button class="cmd-chip" data-terminal-cmd="project --deepfake" type="button">project --deepfake</button>
+          <button class="cmd-chip" data-terminal-cmd="project --impact-iq" type="button">project --impact-iq</button>
+          <button class="cmd-chip" data-terminal-cmd="project --disaster-radar" type="button">project --disaster-radar</button>
+          <button class="cmd-chip" data-terminal-cmd="skills --lang" type="button">skills --lang</button>
+          <button class="cmd-chip" data-terminal-cmd="skills --genai" type="button">skills --genai</button>
+          <button class="cmd-chip" data-terminal-cmd="skills --ml" type="button">skills --ml</button>
+          <button class="cmd-chip" data-terminal-cmd="skills --web" type="button">skills --web</button>
+          <button class="cmd-chip" data-terminal-cmd="skills --db" type="button">skills --db</button>
+          <button class="cmd-chip" data-terminal-cmd="skills --devops" type="button">skills --devops</button>
+          <button class="cmd-chip" data-terminal-cmd="education" type="button">education</button>
+        </div>
+
+        <div id="terminal-output" class="terminal-output">
+          <div class="term-line">
+            🤖 <strong>Parthib Dey's +AI Portfolio Agent initialized.</strong> Click a command chip above to inspect <code>Deepfake Detector (97.29% ROC-AUC)</code>, <code>Impact-IQ (GraphRAG + Docker)</code>, or <code>DisasterRadar.ai (0.978 ROC-AUC)</code>!
+          </div>
+        </div>
+
+        <form id="terminal-form" class="terminal-form">
+          <span class="term-prompt">parthib@portfolio:~$</span>
+          <input
+            id="terminal-input"
+            class="terminal-input"
+            type="text"
+            placeholder="Type a command (e.g., project --impact-iq, GraphRAG, OpenCV, FastAPI, education)..."
+            autocomplete="off"
+          />
+          <button type="submit" class="hud-btn hud-btn-accent">Run ↵</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- EDUCATIONAL QUALIFICATION SECTION -->
+    <section id="experience" class="section container">
+      <div class="section-header interactive-panel">
+        <span class="section-eyebrow">04 // Academic & Engineering Foundation</span>
+        <h2 class="section-title">Educational Qualification</h2>
+        <p class="section-subtitle">
+          Bachelor of Engineering in Artificial Intelligence & Machine Learning at CMR Institute of Technology, Bengaluru (2027 Pursuing).
+        </p>
+      </div>
+
+      <div id="experience-timeline" class="timeline interactive-panel"></div>
+    </section>
+
+    <!-- CONTACT & DEPLOYMENT SECTION -->
+    <section id="contact" class="section container">
+      <div class="contact-grid interactive-panel">
+        <div class="contact-card">
+          <span class="section-eyebrow">05 // Connect with Parthib Dey</span>
+          <h2 class="section-title">Let's Build Scalable AI & Web Systems</h2>
+          <p class="section-subtitle" style="margin-bottom: 20px;">
+            Open to Full-Stack AI, Machine Learning, and Software Engineering opportunities. Reach out directly via email, phone, or the form.
+          </p>
+          <div class="project-metrics">
+            <div class="metric-item">📍 <strong>Address:</strong> Mr & Ms Coliving, AECS Layout, Bengaluru – 560037</div>
+            <div class="metric-item">📧 <strong>Email 1:</strong> <a href="mailto:Parthib100320@gmail.com" style="color:var(--accent-pink);text-decoration:none;">Parthib100320@gmail.com</a></div>
+            <div class="metric-item">🎓 <strong>Email 2:</strong> <a href="mailto:prde23aiml@cmrit.ac.in" style="color:var(--accent-pink);text-decoration:none;">prde23aiml@cmrit.ac.in</a></div>
+            <div class="metric-item">📱 <strong>Mobile:</strong> <a href="tel:+917099647523" style="color:var(--text-main);text-decoration:none;">+91 7099647523</a></div>
+            <div class="metric-item">🔗 <strong>GitHub:</strong> <a href="https://github.com/Riyan-ai-code" target="_blank" rel="noopener" style="color:var(--accent-pink);text-decoration:none;">github.com/Riyan-ai-code ↗</a></div>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <form id="contact-form">
+            <div class="form-group">
+              <label for="contact-name">Your Name</label>
+              <input id="contact-name" class="form-control" type="text" required placeholder="Recruiter / Collaborator Name" />
+            </div>
+            <div class="form-group">
+              <label for="contact-email">Your Email</label>
+              <input id="contact-email" class="form-control" type="email" required placeholder="you@company.com" />
+            </div>
+            <div class="form-group">
+              <label for="contact-msg">Role or Project Details</label>
+              <textarea id="contact-msg" class="form-control" rows="4" required placeholder="Hi Parthib, we'd love to discuss an AI / Full-Stack opportunity..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+              Transmit Message to Parthib ⚡
+            </button>
+            <div id="contact-status" class="contact-status"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer container interactive-panel">
+      <p>© 2026 <span id="footer-name">Parthib Dey</span> • B.E. AI & ML (CMRIT Bengaluru) • Engineered with Three.js WebGL, GSAP & Docker</p>
+    </footer>
+
+  </main>
+
+  <!-- Application Script -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
