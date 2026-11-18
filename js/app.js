@@ -61,33 +61,66 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initLightSidebar() {
-  const fillEl = document.getElementById('sidebar-light-fill');
-  const dots = Array.from(document.querySelectorAll('.sidebar-node-dot'));
-  const sectionIds = ['top', 'about', 'skills', 'projects', 'ai-terminal', 'experience', 'contact'];
+  const rail = document.getElementById('hud-scroller-rail');
+  const shuttle = document.getElementById('hud-scroller-shuttle');
+  const readout = document.getElementById('hud-shuttle-readout');
 
-  const updateSidebar = () => {
+  const sections = [
+    { id: 'top', code: 'STG' },
+    { id: 'about', code: 'ABT' },
+    { id: 'skills', code: 'SKL' },
+    { id: 'projects', code: 'PRJ' },
+    { id: 'ai-terminal', code: 'TRM' },
+    { id: 'experience', code: 'EDU' },
+    { id: 'contact', code: 'CNT' }
+  ];
+
+  const updateScroller = () => {
     const maxScroll = Math.max(1, document.body.scrollHeight - window.innerHeight);
     const ratio = Math.min(1, Math.max(0, window.scrollY / maxScroll));
-    if (fillEl) {
-      fillEl.style.height = `${Math.max(8, ratio * 100).toFixed(1)}%`;
+    const pct = Math.round(ratio * 100);
+
+    if (shuttle) {
+      shuttle.style.top = `${(ratio * 100).toFixed(1)}%`;
     }
 
-    let activeId = 'top';
+    let activeCode = 'STG';
     const scrollMid = window.scrollY + window.innerHeight * 0.38;
-    for (const id of sectionIds) {
-      const el = document.getElementById(id);
+    for (const s of sections) {
+      const el = document.getElementById(s.id);
       if (el && el.offsetTop <= scrollMid) {
-        activeId = id;
+        activeCode = s.code;
       }
     }
 
-    dots.forEach((d) => {
-      d.classList.toggle('active', d.dataset.section === activeId);
-    });
+    if (readout) {
+      readout.textContent = `${String(pct).padStart(2, '0')}% • ${activeCode}`;
+    }
   };
 
-  window.addEventListener('scroll', updateSidebar, { passive: true });
-  updateSidebar();
+  if (rail) {
+    let dragging = false;
+    const scrollFromPointer = (clientY) => {
+      const rect = rail.getBoundingClientRect();
+      const r = Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
+      const maxScroll = Math.max(1, document.body.scrollHeight - window.innerHeight);
+      window.scrollTo({ top: r * maxScroll, behavior: 'auto' });
+    };
+
+    rail.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      scrollFromPointer(e.clientY);
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (dragging) scrollFromPointer(e.clientY);
+    });
+    window.addEventListener('pointerup', () => {
+      dragging = false;
+    });
+  }
+
+  window.addEventListener('scroll', updateScroller, { passive: true });
+  updateScroller();
 }
 
 /**

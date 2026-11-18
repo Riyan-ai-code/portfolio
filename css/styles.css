@@ -37,15 +37,129 @@ html {
   background-color: var(--bg-studio);
   color: var(--text-main);
   font-family: var(--font-sans);
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 }
 
-/* Completely hide the browser scrollbar on the right edge */
+/* ============================================================================
+   CUSTOM FUTURISTIC CYBER-HUD SCROLLBAR (No ugly OS arrows or solid pink bar!)
+   Note: Do NOT set `scrollbar-color` or `scrollbar-width` on html/body,
+   because Chrome 121+ disables ::-webkit-scrollbar when those are present.
+   ============================================================================ */
 ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-button {
   display: none;
   width: 0;
   height: 0;
+}
+
+::-webkit-scrollbar-track {
+  background: #05060b;
+  border-left: 1px solid rgba(0, 242, 254, 0.12);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 242, 254, 0.25) 0%,
+    rgba(0, 242, 254, 0.85) 50%,
+    rgba(139, 92, 246, 0.85) 100%
+  );
+  border-radius: 999px;
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.35);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #00f2fe, #8b5cf6);
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.8);
+}
+
+/* ============================================================================
+   SCI-FI HUD ALTITUDE / DEPTH TELEMETRY SCROLLER (Right Edge)
+   ============================================================================ */
+.hud-telemetry-scroller {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 240px;
+  width: 34px;
+  z-index: 31;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.hud-scroller-cap {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
+.hud-scroller-rail {
+  position: relative;
+  flex: 1;
+  width: 2px;
+  margin: 8px 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 242, 254, 0.35) 0px,
+    rgba(0, 242, 254, 0.35) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  cursor: pointer;
+}
+
+.hud-scroller-shuttle {
+  position: absolute;
+  left: 50%;
+  top: 0%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: grab;
+  transition: top 0.08s ease-out;
+}
+
+.hud-shuttle-diamond {
+  width: 12px;
+  height: 12px;
+  background: #05060b;
+  border: 2px solid var(--accent-cyan);
+  transform: rotate(45deg);
+  box-shadow: 0 0 12px var(--accent-cyan);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.hud-scroller-shuttle:hover .hud-shuttle-diamond {
+  background: var(--accent-cyan);
+  transform: rotate(135deg) scale(1.2);
+}
+
+.hud-shuttle-readout {
+  position: absolute;
+  right: 18px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: rgba(8, 12, 26, 0.92);
+  border: 1px solid rgba(0, 242, 254, 0.45);
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
 }
 
 body {
