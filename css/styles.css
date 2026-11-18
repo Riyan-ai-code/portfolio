@@ -37,113 +37,15 @@ html {
   background-color: var(--bg-studio);
   color: var(--text-main);
   font-family: var(--font-sans);
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent-pink) #05060b;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-/* Custom Glowing Cyber Scrollbar (Eliminates ugly default white Windows scrollbar) */
+/* Completely hide the browser scrollbar on the right edge */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #05060b;
-  border-left: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--accent-cyan), var(--accent-pink));
-  border-radius: 999px;
-  box-shadow: 0 0 12px var(--accent-pink);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #ffffff, var(--accent-cyan));
-}
-
-/* Interactive Vertical Neon Light Sidebar on Right Edge */
-.cyber-light-sidebar {
-  position: fixed;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 31;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 8px;
-  border-radius: 999px;
-  background: rgba(8, 12, 24, 0.78);
-  border: 1px solid var(--border-glass);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65), 0 0 20px rgba(0, 242, 254, 0.12);
-}
-
-.sidebar-light-track {
-  position: absolute;
-  top: 18px;
-  bottom: 18px;
-  width: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.sidebar-light-fill {
-  width: 100%;
-  height: 15%;
-  background: linear-gradient(180deg, var(--accent-cyan), var(--accent-pink));
-  box-shadow: 0 0 10px var(--accent-cyan);
-  transition: height 0.12s ease-out;
-}
-
-.sidebar-node-dot {
-  position: relative;
-  z-index: 1;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #0b0f1e;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-}
-
-.sidebar-node-dot:hover,
-.sidebar-node-dot.active {
-  background: var(--accent-cyan);
-  border-color: #ffffff;
-  box-shadow: 0 0 14px var(--accent-cyan);
-  transform: scale(1.25);
-}
-
-.sidebar-node-dot::before {
-  content: attr(data-label);
-  position: absolute;
-  right: 22px;
-  top: 50%;
-  transform: translateY(-50%) translateX(6px);
-  padding: 4px 10px;
-  border-radius: 6px;
-  background: rgba(8, 12, 24, 0.94);
-  border: 1px solid var(--accent-cyan);
-  color: #ffffff;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 700;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.sidebar-node-dot:hover::before {
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 body {
@@ -427,8 +329,8 @@ body {
 .skill-inspector {
   position: fixed;
   top: 84px;
-  right: 52px;
-  width: min(375px, calc(100% - 76px));
+  right: 24px;
+  width: min(375px, calc(100% - 48px));
   z-index: 32;
   padding: 24px;
   border-radius: 22px;
@@ -568,7 +470,7 @@ body {
    ============================================================================ */
 .stage-interactive-dock {
   position: fixed;
-  bottom: 84px;
+  bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
   width: min(1320px, calc(100% - 44px));
